@@ -1,9 +1,12 @@
 """
 app.py - Flask Web Application for Campus Lost & Found Intelligent Matching System
+Compatible with local execution and Serverless deployments (Vercel, AWS Lambda, Render).
 """
 
 import os
 import re
+import shutil
+import tempfile
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
@@ -11,20 +14,57 @@ from werkzeug.utils import secure_filename
 import database
 from matcher import calculate_match_score, compute_dhash
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    static_folder=os.path.join(BASE_DIR, "static"),
+    template_folder=os.path.join(BASE_DIR, "templates")
+)
 app.config["SECRET_KEY"] = "findit-campus-intelligent-matching-secret-2026"
-app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "static", "uploads")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB max
 
-os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+# Determine UPLOAD_FOLDER safely (writable tempdir on serverless / read-only environments)
+if database.is_serverless_or_readonly():
+    app.config["UPLOAD_FOLDER"] = os.path.join(tempfile.gettempdir(), "findit_uploads")
+else:
+    app.config["UPLOAD_FOLDER"] = os.path.join(BASE_DIR, "static", "uploads")
+
+try:
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+except Exception as e:
+    print(f"Notice: Upload folder creation: {e}")
+
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "svg"}
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Ensure DB is created and seeded
-database.init_db()
-database.seed_data()
+# Ensure DB is created and seeded safely
+try:
+    database.init_db()
+    database.seed_data()
+except Exception as e:
+    print(f"Notice during DB initialization: {e}")
+
+@app.route("/static/uploads/<path:filename>")
+def uploaded_file(filename):
+    """Serve uploaded images safely from either UPLOAD_FOLDER or local static/uploads."""
+    if os.path.exists(os.path.join(app.config["UPLOAD_FOLDER"], filename)):
+        return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+    bundled = os.path.join(BASE_DIR, "static", "uploads")
+    if os.path.exists(os.path.join(bundled, filename)):
+        return send_from_directory(bundled, filename)
+    return "File not found", 404
+
+@app.route("/api/health", methods=["GET"])
+def health_check():
+    """Health check endpoint for cloud monitoring."""
+    return jsonify({
+        "status": "healthy",
+        "service": "FindIt Campus Matching Engine",
+        "timestamp": datetime.now().isoformat()
+    })
 
 @app.route("/")
 def index():

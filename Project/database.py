@@ -1,78 +1,113 @@
 """
 database.py - SQLite Database Management & Data Seeding
 Handles storage for lost and found items, matches, and claims.
+Compatible with local environments and serverless platforms (Vercel/AWS Lambda).
 """
 
 import sqlite3
 import os
+import shutil
+import tempfile
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "findit.db")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOCAL_DB_PATH = os.path.join(BASE_DIR, "findit.db")
+
+def is_serverless_or_readonly():
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        return True
+    try:
+        test_file = os.path.join(BASE_DIR, ".perm_test")
+        with open(test_file, "w") as f:
+            f.write("ok")
+        os.remove(test_file)
+        return False
+    except (IOError, OSError, PermissionError):
+        return True
+
+def get_db_path():
+    if is_serverless_or_readonly():
+        tmp_dir = tempfile.gettempdir()
+        tmp_db = os.path.join(tmp_dir, "findit.db")
+        # If /tmp/findit.db does not exist yet, copy initial findit.db from repo
+        if not os.path.exists(tmp_db) and os.path.exists(LOCAL_DB_PATH):
+            try:
+                shutil.copy2(LOCAL_DB_PATH, tmp_db)
+            except Exception as e:
+                print(f"Notice: Could not copy initial db to /tmp: {e}")
+        return tmp_db
+    return LOCAL_DB_PATH
+
+DB_PATH = LOCAL_DB_PATH
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(get_db_path())
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    # Items table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        type TEXT NOT NULL,                  -- 'lost' or 'found'
-        title TEXT NOT NULL,
-        category TEXT NOT NULL,
-        brand TEXT DEFAULT '',
-        color TEXT DEFAULT '',
-        location TEXT NOT NULL,
-        date_lost_found TEXT NOT NULL,
-        time_lost_found TEXT DEFAULT '',
-        description TEXT DEFAULT '',
-        unique_marks TEXT DEFAULT '',
-        image_path TEXT DEFAULT '',
-        verification_question TEXT DEFAULT '',
-        verification_answer TEXT DEFAULT '',
-        contact_name TEXT NOT NULL,
-        contact_email TEXT NOT NULL,
-        contact_phone TEXT DEFAULT '',
-        status TEXT DEFAULT 'active',        -- 'active', 'matched', 'claimed', 'resolved'
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """)
-    
-    # Claims table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS claims (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        lost_item_id INTEGER,
-        found_item_id INTEGER,
-        claimant_name TEXT NOT NULL,
-        claimant_email TEXT NOT NULL,
-        claimant_phone TEXT DEFAULT '',
-        claimant_answer TEXT NOT NULL,
-        match_score INTEGER DEFAULT 0,
-        status TEXT DEFAULT 'pending',       -- 'pending', 'approved', 'rejected'
-        notes TEXT DEFAULT '',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (lost_item_id) REFERENCES items (id),
-        FOREIGN KEY (found_item_id) REFERENCES items (id)
-    );
-    """)
-    
-    conn.commit()
-    conn.close()
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Items table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL,                  -- 'lost' or 'found'
+            title TEXT NOT NULL,
+            category TEXT NOT NULL,
+            brand TEXT DEFAULT '',
+            color TEXT DEFAULT '',
+            location TEXT NOT NULL,
+            date_lost_found TEXT NOT NULL,
+            time_lost_found TEXT DEFAULT '',
+            description TEXT DEFAULT '',
+            unique_marks TEXT DEFAULT '',
+            image_path TEXT DEFAULT '',
+            verification_question TEXT DEFAULT '',
+            verification_answer TEXT DEFAULT '',
+            contact_name TEXT NOT NULL,
+            contact_email TEXT NOT NULL,
+            contact_phone TEXT DEFAULT '',
+            status TEXT DEFAULT 'active',        -- 'active', 'matched', 'claimed', 'resolved'
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+        
+        # Claims table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS claims (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lost_item_id INTEGER,
+            found_item_id INTEGER,
+            claimant_name TEXT NOT NULL,
+            claimant_email TEXT NOT NULL,
+            claimant_phone TEXT DEFAULT '',
+            claimant_answer TEXT NOT NULL,
+            match_score INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'pending',       -- 'pending', 'approved', 'rejected'
+            notes TEXT DEFAULT '',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (lost_item_id) REFERENCES items (id),
+            FOREIGN KEY (found_item_id) REFERENCES items (id)
+        );
+        """)
+        
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Notice during init_db: {e}")
 
 def seed_data():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM items")
-    count = cursor.fetchone()[0]
-    
-    if count == 0:
-        sample_items = [
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM items")
+        count = cursor.fetchone()[0]
+        
+        if count == 0:
+            sample_items = [
             # Pair 1: Laptop Bag in AB1 Hall
             (
                 "lost",
@@ -312,27 +347,29 @@ def seed_data():
                 "+91 98765 67890",
                 "active"
             )
-        ]
-        
-        cursor.executemany("""
-        INSERT INTO items (
-            type, title, category, brand, color, location,
-            date_lost_found, time_lost_found, description, unique_marks,
-            image_path, verification_question, verification_answer,
-            contact_name, contact_email, contact_phone, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, sample_items)
-        
-        # Add sample approved/resolved claim to demonstrate dashboard resolution
-        cursor.execute("""
-        INSERT INTO claims (
-            lost_item_id, found_item_id, claimant_name, claimant_email,
-            claimant_phone, claimant_answer, match_score, status, notes
-        ) VALUES (1, 2, 'Aarav Sharma', 'aarav.sharma@campus.edu', '+1 (555) 234-8901', 'red keychain', 98, 'approved', 'Identity verified, bag returned at library security desk.')
-        """)
-        
-        conn.commit()
-    conn.close()
+            ]
+            
+            cursor.executemany("""
+            INSERT INTO items (
+                type, title, category, brand, color, location,
+                date_lost_found, time_lost_found, description, unique_marks,
+                image_path, verification_question, verification_answer,
+                contact_name, contact_email, contact_phone, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, sample_items)
+            
+            # Add sample approved/resolved claim to demonstrate dashboard resolution
+            cursor.execute("""
+            INSERT INTO claims (
+                lost_item_id, found_item_id, claimant_name, claimant_email,
+                claimant_phone, claimant_answer, match_score, status, notes
+            ) VALUES (1, 2, 'Aarav Sharma', 'aarav.sharma@campus.edu', '+1 (555) 234-8901', 'red keychain', 98, 'approved', 'Identity verified, bag returned at library security desk.')
+            """)
+            
+            conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Notice during seed_data: {e}")
 
 if __name__ == "__main__":
     init_db()
