@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FindIt — Campus Lost & Found Intelligent Matching System</title>
+  <meta name="description" content="AI-assisted university lost and found system featuring multi-factor algorithmic similarity matching, spatial proximity, and privacy-protected ownership verification.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-theme">
+
+  <!-- TOP NOTIFICATION TICKER -->
+  <div class="match-ticker-bar" id="tickerBar">
+    <div class="ticker-content">
+      <span class="ticker-badge"><i class="fa-solid fa-bolt"></i> Live CSE Match Engine</span>
+      <span class="ticker-text" id="tickerText">
+        🔔 Possible Match Detected — <strong>Black HP Laptop Bag</strong> matched with <strong>Central Library Found Report</strong> (98% similarity)
+      </span>
+      <button class="ticker-btn" onclick="openDemoMatch(1, 2)">Inspect Analysis</button>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand" onclick="switchTab('feed')">
+        <div class="brand-logo">
+          <i class="fa-solid fa-satellite-dish"></i>
+        </div>
+        <div class="brand-info">
+          <span class="brand-title">Find<span class="highlight">It</span></span>
+          <span class="brand-subtitle">VIT Bhopal Intelligent Matcher</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-item active" data-tab="feed" onclick="switchTab('feed')">
+          <i class="fa-solid fa-compass"></i> Explore Items
+        </button>
+        <button class="nav-item" data-tab="map" onclick="switchTab('map')">
+          <i class="fa-solid fa-map-location-dot"></i> Campus Map
+        </button>
+        <button class="nav-item" data-tab="sandbox" onclick="switchTab('sandbox')">
+          <i class="fa-solid fa-microchip"></i> CSE Algorithm Lab
+        </button>
+        <button class="nav-item" data-tab="dashboard" onclick="switchTab('dashboard')">
+          <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-danger-soft" onclick="openReportModal('lost')">
+          <i class="fa-solid fa-circle-exclamation"></i> I Lost Something
+        </button>
+        <button class="btn btn-primary" onclick="openReportModal('found')">
+          <i class="fa-solid fa-hand-holding-heart"></i> I Found Something
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-content">
+
+    <!-- HERO SECTION (Visible on Feed tab) -->
+    <section class="hero-section" id="heroSection">
+      <div class="hero-background-glow"></div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fa-solid fa-brain"></i> CSE Capstone: Multi-Factor Semantic & Spatial Matching
+        </div>
+        <h1 class="hero-title">
+          Lost Something on Campus? <br>
+          <span class="gradient-text">We'll Automatically Find It.</span>
+        </h1>
+        <p class="hero-desc">
+          Stop scrolling through messy chat groups. Our intelligent algorithm continuously cross-analyzes item taxonomy, brand aliases, color families, spatial coordinates, time proximity, and secret identifying marks.
+        </p>
+        
+        <div class="hero-actions">
+          <button class="btn btn-hero btn-hero-lost" onclick="openReportModal('lost')">
+            <div class="btn-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="btn-text">
+              <span class="btn-main">I Lost Something</span>
+              <span class="btn-sub">Broadcast report to campus database</span>
+            </div>
+          </button>
+
+          <button class="btn btn-hero btn-hero-found" onclick="openReportModal('found')">
+            <div class="btn-icon"><i class="fa-solid fa-box-open"></i></div>
+            <div class="btn-text">
+              <span class="btn-main">I Found Something</span>
+              <span class="btn-sub">Auto-match without exposing owner info</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- LIVE METRICS BANNER -->
+        <div class="hero-stats-row" id="heroStatsRow">
+          <div class="hero-stat-pill">
+            <i class="fa-solid fa-circle-dot text-danger"></i>
+            <span id="heroLostCount">0</span> Lost Reports
+          </div>
+          <div class="hero-stat-pill">
+            <i class="fa-solid fa-circle-check text-success"></i>
+            <span id="heroFoundCount">0</span> Found Items
+          </div>
+          <div class="hero-stat-pill">
+            <i class="fa-solid fa-wand-magic-sparkles text-primary"></i>
+            <span id="heroMatchesCount">0</span> Automated Matches
+          </div>
+          <div class="hero-stat-pill">
+            <i class="fa-solid fa-shield-halved text-warning"></i>
+            <span>Privacy Challenge Guarded</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: EXPLORE FEED TAB -->
+    <section class="tab-panel active" id="tab-feed">
+      
+      <!-- CONTROLS & FILTER BAR -->
+      <div class="controls-card">
+        <div class="filter-group-primary">
+          <div class="type-pill-group">
+            <button class="pill-btn active" data-type="" onclick="setTypeFilter('')">
+              All Items <span class="pill-count" id="countAll">0</span>
+            </button>
+            <button class="pill-btn pill-lost" data-type="lost" onclick="setTypeFilter('lost')">
+              <i class="fa-solid fa-circle-exclamation"></i> Lost <span class="pill-count" id="countLost">0</span>
+            </button>
+            <button class="pill-btn pill-found" data-type="found" onclick="setTypeFilter('found')">
+              <i class="fa-solid fa-hand-holding-heart"></i> Found <span class="pill-count" id="countFound">0</span>
+            </button>
+          </div>
+
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search by item name, brand, color, location..." oninput="handleSearch(this.value)">
+            <button class="search-clear-btn" id="searchClearBtn" onclick="clearSearch()" style="display:none;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-group-secondary">
+          <div class="filter-select-wrap">
+            <i class="fa-solid fa-layer-group"></i>
+            <select id="categorySelect" onchange="handleCategoryFilter(this.value)">
+              <option value="">All Categories</option>
+              <option value="laptop">Laptops & Computers</option>
+              <option value="bag">Bags & Backpacks</option>
+              <option value="earphones">AirPods & Headphones</option>
+              <option value="calculator">Calculators & Electronics</option>
+              <option value="bottle">Bottles & Drinkware</option>
+              <option value="id card">Student Cards & IDs</option>
+            </select>
+          </div>
+
+          <div class="filter-select-wrap">
+            <i class="fa-solid fa-location-dot"></i>
+            <select id="locationSelect" onchange="handleLocationFilter(this.value)">
+              <option value="">All VIT Bhopal Locations</option>
+              <optgroup label="Academic & Auditoriums">
+                <option value="AB1 Hall">AB1 Hall</option>
+                <option value="AB2">AB2</option>
+                <option value="MPH">MPH (Multipurpose Hall)</option>
+                <option value="Open Audi">Open Audi (Open Auditorium)</option>
+              </optgroup>
+              <optgroup label="Facilities & Gates">
+                <option value="Hospital">Hospital / Health Centre</option>
+                <option value="Parking Gate / Parcel Point">Parking Gate / Parcel Point</option>
+                <option value="Main Gate of Entrance">Main Gate of Entrance</option>
+              </optgroup>
+              <optgroup label="Boys Hostels">
+                <option value="Boys Hostel 1">Boys Hostel 1</option>
+                <option value="Boys Hostel 2">Boys Hostel 2</option>
+                <option value="Boys Hostel 3">Boys Hostel 3</option>
+                <option value="Boys Hostel 4">Boys Hostel 4</option>
+                <option value="Boys Hostel 5">Boys Hostel 5</option>
+                <option value="Boys Hostel 6">Boys Hostel 6</option>
+                <option value="Boys Hostel 7A">Boys Hostel 7A</option>
+                <option value="Boys Hostel 7B">Boys Hostel 7B</option>
+                <option value="Boys Hostel 8A">Boys Hostel 8A</option>
+                <option value="Boys Hostel 8B">Boys Hostel 8B</option>
+              </optgroup>
+              <optgroup label="Girls Hostels">
+                <option value="Girls Hostel 1">Girls Hostel 1</option>
+                <option value="Girls Hostel 2">Girls Hostel 2</option>
+                <option value="Girls Hostel Block A">Girls Hostel Block A</option>
+                <option value="Girls Hostel Block B">Girls Hostel Block B</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <button class="btn btn-ghost" onclick="resetFilters()">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- ITEMS GRID -->
+      <div class="items-grid-wrapper">
+        <div class="section-subhead">
+          <h2 class="subhead-title">
+            <i class="fa-solid fa-boxes-stacked"></i> Recent Campus Reports
+          </h2>
+          <span class="subhead-badge" id="resultsCount">Showing items...</span>
+        </div>
+
+        <div class="items-grid" id="itemsGrid">
+          <!-- Populated dynamically by app.js -->
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <div class="empty-icon"><i class="fa-solid fa-inbox"></i></div>
+          <h3>No items found</h3>
+          <p>Try adjusting your search query or filters.</p>
+          <button class="btn btn-outline" onclick="resetFilters()">Clear Filters</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: INTERACTIVE CAMPUS MAP TAB -->
+    <section class="tab-panel" id="tab-map">
+      <div class="map-view-header">
+        <div>
+          <h2 class="page-title"><i class="fa-solid fa-map-location-dot"></i> VIT Bhopal University Spatial Map</h2>
+          <p class="page-subtitle">Real-time coordinate visualization of lost (🟥) and found (🟢) items across VIT Bhopal facilities (Kothri Kalan Campus).</p>
+        </div>
+        <div class="map-legend">
+          <div class="legend-item"><span class="legend-dot dot-lost"></span> Lost Items</div>
+          <div class="legend-item"><span class="legend-dot dot-found"></span> Found Items</div>
+          <div class="legend-item"><span class="legend-zone"></span> VIT Bhopal Campus Buildings</div>
+        </div>
+      </div>
+
+      <div class="map-container-layout">
+        <!-- SVG Interactive Campus Map Canvas -->
+        <div class="campus-svg-card">
+          <div class="map-svg-viewport" id="campusSvgWrapper">
+            <svg id="campusMapSvg" viewBox="0 0 650 520" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="campusGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#1e293b" stop-opacity="0.85"/>
+                  <stop offset="100%" stop-color="#090d16" stop-opacity="0.98"/>
+                </radialGradient>
+                <pattern id="campusGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                  <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1e293b" stroke-width="0.75" opacity="0.6"/>
+                </pattern>
+                <filter id="pinShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.6"/>
+                </filter>
+              </defs>
+
+              <!-- Map Base Background & Grid -->
+              <rect width="650" height="520" rx="16" fill="url(#campusGlow)"/>
+              <rect width="650" height="520" rx="16" fill="url(#campusGrid)"/>
+
+              <!-- Campus Water Body / Lake Feature -->
+              <ellipse cx="280" cy="330" rx="45" ry="25" fill="#0369a1" opacity="0.25" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4 2"/>
+              <text x="280" y="334" fill="#38bdf8" font-family="Outfit" font-size="9" text-anchor="middle">Lake / Eco Zone</text>
+
+              <!-- Campus Walkways & Ring Roads -->
+              <path d="M 40 440 L 610 440" stroke="#334155" stroke-width="10" stroke-linecap="round" opacity="0.4"/>
+              <path d="M 90 100 L 90 440" stroke="#334155" stroke-width="8" stroke-linecap="round" opacity="0.4"/>
+              <path d="M 520 100 L 520 440" stroke="#334155" stroke-width="8" stroke-linecap="round" opacity="0.4"/>
+              <path d="M 90 220 L 520 220" stroke="#334155" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+              <path d="M 200 90 L 200 440" stroke="#334155" stroke-width="8" stroke-dasharray="6 4" opacity="0.4"/>
+              <path d="M 350 90 L 350 440" stroke="#334155" stroke-width="8" stroke-dasharray="6 4" opacity="0.4"/>
+
+              <!-- VIT BHOPAL EXACT REQUESTED LOCATIONS -->
+
+              <!-- 1. AB1 Hall -->
+              <g class="map-building" onclick="filterMapByLocation('AB1 Hall')">
+                <rect x="140" y="75" width="110" height="70" rx="10" fill="#1e293b" stroke="#a855f7" stroke-width="2"/>
+                <text x="195" y="108" fill="#c084fc" font-family="Outfit" font-size="13" font-weight="800" text-anchor="middle">🏫 AB1 Hall</text>
+                <text x="195" y="126" fill="#94a3b8" font-family="Outfit" font-size="10" text-anchor="middle">Academic Block 1</text>
+              </g>
+
+              <!-- 2. AB2 -->
+              <g class="map-building" onclick="filterMapByLocation('AB2')">
+                <rect x="270" y="75" width="110" height="70" rx="10" fill="#1e293b" stroke="#8b5cf6" stroke-width="2"/>
+                <text x="325" y="108" fill="#a78bfa" font-family="Outfit" font-size="13" font-weight="800" text-anchor="middle">🏫 AB2</text>
+                <text x="325" y="126" fill="#94a3b8" font-family="Outfit" font-size="10" text-anchor="middle">Academic Block 2</text>
+              </g>
+
+              <!-- 3. MPH (Multipurpose Hall) -->
+              <g class="map-building" onclick="filterMapByLocation('MPH')">
+                <rect x="160" y="170" width="105" height="75" rx="10" fill="#1e293b" stroke="#ec4899" stroke-width="2"/>
+                <text x="212" y="205" fill="#f472b6" font-family="Outfit" font-size="13" font-weight="800" text-anchor="middle">🎭 MPH</text>
+                <text x="212" y="223" fill="#94a3b8" font-family="Outfit" font-size="10" text-anchor="middle">Multipurpose Hall</text>
+              </g>
+
+              <!-- 4. Open Audi -->
+              <g class="map-building" onclick="filterMapByLocation('Open Audi')">
+                <rect x="285" y="170" width="105" height="75" rx="10" fill="#1e293b" stroke="#f43f5e" stroke-width="2"/>
+                <text x="337" y="205" fill="#fb7185" font-family="Outfit" font-size="13" font-weight="800" text-anchor="middle">🎪 Open Audi</text>
+                <text x="337" y="223" fill="#94a3b8" font-family="Outfit" font-size="10" text-anchor="middle">Open Air Theatre</text>
+              </g>
+
+              <!-- 5. Girls Hostel 1, 2 -->
+              <g class="map-building" onclick="filterMapByLocation('Girls Hostel 1')">
+                <rect x="20" y="85" width="100" height="65" rx="10" fill="#1e293b" stroke="#ec4899" stroke-width="1.8"/>
+                <text x="70" y="118" fill="#f472b6" font-family="Outfit" font-size="11" font-weight="700" text-anchor="middle">🏢 Girls Hostel</text>
+                <text x="70" y="134" fill="#cbd5e1" font-family="Outfit" font-size="10" font-weight="600" text-anchor="middle">Blocks 1 &amp; 2</text>
+              </g>
+
+              <!-- 6. Girls Hostel Block A, B -->
+              <g class="map-building" onclick="filterMapByLocation('Girls Hostel Block A')">
+                <rect x="20" y="175" width="100" height="70" rx="10" fill="#1e293b" stroke="#fb7185" stroke-width="1.8"/>
+                <text x="70" y="208" fill="#fb7185" font-family="Outfit" font-size="11" font-weight="700" text-anchor="middle">🏢 Girls Hostel</text>
+                <text x="70" y="224" fill="#cbd5e1" font-family="Outfit" font-size="10" font-weight="600" text-anchor="middle">Block A &amp; B</text>
+              </g>
+
+              <!-- 7. Boys Hostel 1, 2, 3 -->
+              <g class="map-building" onclick="filterMapByLocation('Boys Hostel 1')">
+                <rect x="410" y="75" width="105" height="65" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.8"/>
+                <text x="462" y="106" fill="#38bdf8" font-family="Outfit" font-size="11" font-weight="700" text-anchor="middle">🏢 Boys Hostel</text>
+                <text x="462" y="122" fill="#cbd5e1" font-family="Outfit" font-size="10" font-weight="600" text-anchor="middle">BH 1, 2, 3</text>
+              </g>
+
+              <!-- 8. Boys Hostel 4, 5, 6 -->
+              <g class="map-building" onclick="filterMapByLocation('Boys Hostel 4')">
+                <rect x="530" y="75" width="105" height="65" rx="10" fill="#1e293b" stroke="#0ea5e9" stroke-width="1.8"/>
+                <text x="582" y="106" fill="#38bdf8" font-family="Outfit" font-size="11" font-weight="700" text-anchor="middle">🏢 Boys Hostel</text>
+                <text x="582" y="122" fill="#cbd5e1" font-family="Outfit" font-size="10" font-weight="600" text-anchor="middle">BH 4, 5, 6</text>
+              </g>
+
+              <!-- 9. Boys Hostel 7A, 7B -->
+              <g class="map-building" onclick="filterMapByLocation('Boys Hostel 7A')">
+                <rect x="410" y="160" width="105" height="65" rx="10" fill="#1e293b" stroke="#6366f1" stroke-width="1.8"/>
+                <text x="462" y="191" fill="#818cf8" font-family="Outfit" font-size="11" font-weight="700" text-anchor="middle">🏢 Boys Hostel</text>
+                <text x="462" y="207" fill="#cbd5e1" font-family="Outfit" font-size="10" font-weight="600" text-anchor="middle">BH 7A &amp; 7B</text>
+              </g>
+
+              <!-- 10. Boys Hostel 8A, 8B -->
+              <g class="map-building" onclick="filterMapByLocation('Boys Hostel 8A')">
+                <rect x="530" y="160" width="105" height="65" rx="10" fill="#1e293b" stroke="#818cf8" stroke-width="1.8"/>
+                <text x="582" y="191" fill="#a5b4fc" font-family="Outfit" font-size="11" font-weight="700" text-anchor="middle">🏢 Boys Hostel</text>
+                <text x="582" y="207" fill="#cbd5e1" font-family="Outfit" font-size="10" font-weight="600" text-anchor="middle">BH 8A &amp; 8B</text>
+              </g>
+
+              <!-- 11. Hospital (Health Centre) -->
+              <g class="map-building" onclick="filterMapByLocation('Hospital')">
+                <rect x="80" y="320" width="120" height="75" rx="10" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
+                <text x="140" y="355" fill="#f87171" font-family="Outfit" font-size="13" font-weight="800" text-anchor="middle">🏥 Hospital</text>
+                <text x="140" y="373" fill="#cbd5e1" font-family="Outfit" font-size="10" text-anchor="middle">Health Centre</text>
+              </g>
+
+              <!-- 12. Parking Gate / Parcel Point -->
+              <g class="map-building" onclick="filterMapByLocation('Parking Gate / Parcel Point')">
+                <rect x="220" y="370" width="150" height="65" rx="10" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                <text x="295" y="402" fill="#fbbf24" font-family="Outfit" font-size="12" font-weight="800" text-anchor="middle">📦 Parking Gate</text>
+                <text x="295" y="418" fill="#fde68a" font-family="Outfit" font-size="10" text-anchor="middle">/ Parcel Point</text>
+              </g>
+
+              <!-- 13. Main Gate of Entrance -->
+              <g class="map-building" onclick="filterMapByLocation('Main Gate of Entrance')">
+                <rect x="390" y="370" width="160" height="65" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                <text x="470" y="402" fill="#34d399" font-family="Outfit" font-size="12" font-weight="800" text-anchor="middle">🚪 Main Gate</text>
+                <text x="470" y="418" fill="#a7f3d0" font-family="Outfit" font-size="10" text-anchor="middle">of Entrance</text>
+              </g>
+
+              <!-- Central Plaza / Clock Tower -->
+              <circle cx="280" cy="220" r="15" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+              <text x="280" y="224" fill="#94a3b8" font-size="8" text-anchor="middle">PLAZA</text>
+
+              <!-- Dynamic Map Pins Layer -->
+              <g id="mapPinsLayer">
+                <!-- Dynamically populated by app.js -->
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Sidebar item info for selected pin -->
+        <div class="map-sidebar-card">
+          <h3 class="sidebar-heading"><i class="fa-solid fa-circle-info"></i> Selected Location Item</h3>
+          <div id="mapSidebarContent" class="map-sidebar-body">
+            <div class="map-empty-selection">
+              <i class="fa-solid fa-hand-pointer"></i>
+              <p>Click on any red or green pin on the campus map to view item details and check matching reports.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CSE ALGORITHM LAB / SANDBOX TAB -->
+    <section class="tab-panel" id="tab-sandbox">
+      <div class="sandbox-header">
+        <div>
+          <span class="badge badge-cse"><i class="fa-solid fa-code"></i> CSE 400 Core Algorithm Engine</span>
+          <h2 class="page-title">Live Multi-Factor Similarity Playground</h2>
+          <p class="page-subtitle">Test and visualize the exact points attribution matrix between any Lost and Found parameters in real time.</p>
+        </div>
+
+        <div class="scenario-presets">
+          <span class="preset-label">Quick Scenarios:</span>
+          <button class="btn btn-xs btn-outline" onclick="loadSandboxScenario('laptop_bag')">1. Laptop Bag (98%)</button>
+          <button class="btn btn-xs btn-outline" onclick="loadSandboxScenario('hp_laptop')">2. HP Laptop (96%)</button>
+          <button class="btn btn-xs btn-outline" onclick="loadSandboxScenario('airpods')">3. AirPods (92%)</button>
+          <button class="btn btn-xs btn-outline" onclick="loadSandboxScenario('calculator')">4. Casio Calc (90%)</button>
+          <button class="btn btn-xs btn-outline" onclick="loadSandboxScenario('id_card')">5. Student ID Card (96%)</button>
+          <button class="btn btn-xs btn-outline" onclick="loadSandboxScenario('mismatch')">6. Mismatch (9%)</button>
+        </div>
+      </div>
+
+      <div class="sandbox-grid">
+        <!-- LOST ITEM INPUTS -->
+        <div class="sandbox-card">
+          <div class="card-header lost-header">
+            <i class="fa-solid fa-circle-exclamation text-danger"></i>
+            <h3>Item A: Reported Lost</h3>
+          </div>
+          <div class="sandbox-form">
+            <div class="form-group">
+              <label>Item Name / Title</label>
+              <input type="text" id="sbLostTitle" value="Black HP laptop bag">
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Category</label>
+                <input type="text" id="sbLostCategory" value="laptop bag">
+              </div>
+              <div class="form-group">
+                <label>Brand</label>
+                <input type="text" id="sbLostBrand" value="HP">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Color</label>
+                <input type="text" id="sbLostColor" value="black">
+              </div>
+              <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="sbLostLocation" value="Library">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Date Lost</label>
+                <input type="date" id="sbLostDate" value="2026-09-17">
+              </div>
+              <div class="form-group">
+                <label>Approx. Time</label>
+                <input type="time" id="sbLostTime" value="14:00">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Description (Natural Language)</label>
+              <textarea id="sbLostDesc" rows="2">Lost my black HP laptop bag near the library reading section.</textarea>
+            </div>
+            <div class="form-group">
+              <label>Unique Mark / Secret Detail</label>
+              <input type="text" id="sbLostMark" value="Small red keychain on the zipper">
+            </div>
+          </div>
+        </div>
+
+        <!-- FOUND ITEM INPUTS -->
+        <div class="sandbox-card">
+          <div class="card-header found-header">
+            <i class="fa-solid fa-hand-holding-heart text-success"></i>
+            <h3>Item B: Reported Found</h3>
+          </div>
+          <div class="sandbox-form">
+            <div class="form-group">
+              <label>Item Name / Title</label>
+              <input type="text" id="sbFoundTitle" value="Black laptop bag">
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Category</label>
+                <input type="text" id="sbFoundCategory" value="laptop bag">
+              </div>
+              <div class="form-group">
+                <label>Brand</label>
+                <input type="text" id="sbFoundBrand" value="HP">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Color</label>
+                <input type="text" id="sbFoundColor" value="black">
+              </div>
+              <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="sbFoundLocation" value="Central Library">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Date Found</label>
+                <input type="date" id="sbFoundDate" value="2026-09-17">
+              </div>
+              <div class="form-group">
+                <label>Approx. Time</label>
+                <input type="time" id="sbFoundTime" value="14:30">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Description (Natural Language)</label>
+              <textarea id="sbFoundDesc" rows="2">Found a black HP laptop bag on a bench near Central Library.</textarea>
+            </div>
+            <div class="form-group">
+              <label>Unique Mark / Found Detail</label>
+              <input type="text" id="sbFoundMark" value="Red tag or keychain attached">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sandbox-run-bar">
+        <button class="btn btn-primary btn-lg" onclick="runSandboxMatching()">
+          <i class="fa-solid fa-play"></i> Compute Algorithmic Match Score
+        </button>
+      </div>
+
+      <!-- CSE ALGORITHM RESULTS INSPECTION MATRIX -->
+      <div class="sandbox-results-panel" id="sandboxResultsPanel">
+        <div class="score-summary-banner" id="sbScoreBanner">
+          <div class="score-ring-wrap">
+            <div class="score-circle" id="sbScoreCircle">
+              <span class="score-number" id="sbScoreNum">98</span>
+              <span class="score-unit">/100</span>
+            </div>
+          </div>
+          <div class="score-banner-text">
+            <div class="score-status-row">
+              <span class="badge badge-high" id="sbConfidenceBadge">HIGH CONFIDENCE</span>
+              <span class="score-status-title" id="sbStatusTitle">POSSIBLE MATCH FOUND</span>
+            </div>
+            <p class="score-explanation" id="sbScoreDesc">
+              The matching engine calculated a 98% combined similarity across all 7 weighted heuristic dimensions.
+            </p>
+          </div>
+        </div>
+
+        <!-- BREAKDOWN TABLE -->
+        <div class="factor-matrix-card">
+          <h3 class="matrix-title"><i class="fa-solid fa-calculator"></i> Weighted Heuristic Factor Breakdown</h3>
+          <div class="factor-table-wrap">
+            <table class="factor-table">
+              <thead>
+                <tr>
+                  <th>Factor Dimension</th>
+                  <th>Weight</th>
+                  <th>Score Awarded</th>
+                  <th>Algorithmic Evaluation Reason</th>
+                </tr>
+              </thead>
+              <tbody id="sbBreakdownTbody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: DASHBOARD TAB -->
+    <section class="tab-panel" id="tab-dashboard">
+      <div class="dashboard-header">
+        <h2 class="page-title"><i class="fa-solid fa-chart-pie"></i> Campus Reports Dashboard</h2>
+        <p class="page-subtitle">Real-time repository analytics, high-confidence match alerts, and verified claim workflows.</p>
+      </div>
+
+      <!-- METRICS ROW -->
+      <div class="stats-cards-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-lost"><i class="fa-solid fa-circle-exclamation"></i></div>
+          <div class="stat-data">
+            <span class="stat-number" id="dbLostCount">0</span>
+            <span class="stat-label">Active Lost Reports</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-found"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <div class="stat-data">
+            <span class="stat-number" id="dbFoundCount">0</span>
+            <span class="stat-label">Found Items In Custody</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-matches"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+          <div class="stat-data">
+            <span class="stat-number" id="dbMatchesCount">5</span>
+            <span class="stat-label">Algorithm Matches</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-resolved"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-data">
+            <span class="stat-number" id="dbResolvedCount">0</span>
+            <span class="stat-label">Resolved & Returned</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLAIMS & CLAIMS VERIFICATION TABLE -->
+      <div class="claims-section-card">
+        <div class="claims-header">
+          <div>
+            <h3><i class="fa-solid fa-shield-halved"></i> Ownership Claims & Verification Activity</h3>
+            <p>View challenges submitted by students answering finder's privacy questions.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadClaims()">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh Claims
+          </button>
+        </div>
+
+        <div class="claims-table-wrap">
+          <table class="claims-table">
+            <thead>
+              <tr>
+                <th>Claim ID</th>
+                <th>Found Item</th>
+                <th>Claimant</th>
+                <th>Challenge Answer</th>
+                <th>Match Score</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="claimsTbody">
+              <tr>
+                <td colspan="7" class="text-center">Loading verified claims...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODALS -->
+  <!-- ======================================================== -->
+
+  <!-- 1. REPORT MODAL (Lost or Found) -->
+  <div class="modal-overlay" id="reportModal" onclick="closeModalOnBackdrop(event, 'reportModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i id="reportModalIcon" class="fa-solid fa-circle-exclamation text-danger"></i>
+          <h2 id="reportModalTitle">Report Lost Item</h2>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('reportModal')">&times;</button>
+      </div>
+
+      <form id="reportForm" onsubmit="handleReportSubmit(event)">
+        <input type="hidden" id="reportType" name="type" value="lost">
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="required">Item Title / Name</label>
+            <input type="text" id="formTitle" name="title" required placeholder="e.g., Black HP Laptop Bag">
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="required">Category</label>
+              <select id="formCategory" name="category" required>
+                <option value="">Select Category</option>
+                <option value="laptop bag">Laptop Bag / Backpack</option>
+                <option value="laptop">Laptop / Notebook</option>
+                <option value="earphones">Earbuds / Headphones</option>
+                <option value="calculator">Calculator / Gadget</option>
+                <option value="water bottle">Water Bottle / Flask</option>
+                <option value="id card">Student ID / Cards</option>
+                <option value="keys">Keys / Keychain</option>
+                <option value="clothing">Jacket / Apparel</option>
+                <option value="books">Books / Notes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Brand / Manufacturer</label>
+              <input type="text" id="formBrand" name="brand" placeholder="e.g., HP, Apple, Casio">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Primary Color</label>
+              <input type="text" id="formColor" name="color" placeholder="e.g., Black, Silver, Navy Blue">
+            </div>
+            <div class="form-group">
+              <label class="required">Campus Location</label>
+              <select id="formLocation" name="location" required>
+                <option value="">Select VIT Bhopal Location</option>
+                <optgroup label="Academic & Auditoriums">
+                  <option value="AB1 Hall">AB1 Hall</option>
+                  <option value="AB2">AB2</option>
+                  <option value="MPH">MPH (Multipurpose Hall)</option>
+                  <option value="Open Audi">Open Audi (Open Auditorium)</option>
+                </optgroup>
+                <optgroup label="Healthcare & Gates">
+                  <option value="Hospital">Hospital / Health Centre</option>
+                  <option value="Parking Gate / Parcel Point">Parking Gate / Parcel Point</option>
+                  <option value="Main Gate of Entrance">Main Gate of Entrance</option>
+                </optgroup>
+                <optgroup label="Boys Hostels">
+                  <option value="Boys Hostel 1">Boys Hostel 1</option>
+                  <option value="Boys Hostel 2">Boys Hostel 2</option>
+                  <option value="Boys Hostel 3">Boys Hostel 3</option>
+                  <option value="Boys Hostel 4">Boys Hostel 4</option>
+                  <option value="Boys Hostel 5">Boys Hostel 5</option>
+                  <option value="Boys Hostel 6">Boys Hostel 6</option>
+                  <option value="Boys Hostel 7A">Boys Hostel 7A</option>
+                  <option value="Boys Hostel 7B">Boys Hostel 7B</option>
+                  <option value="Boys Hostel 8A">Boys Hostel 8A</option>
+                  <option value="Boys Hostel 8B">Boys Hostel 8B</option>
+                </optgroup>
+                <optgroup label="Girls Hostels">
+                  <option value="Girls Hostel 1">Girls Hostel 1</option>
+                  <option value="Girls Hostel 2">Girls Hostel 2</option>
+                  <option value="Girls Hostel Block A">Girls Hostel Block A</option>
+                  <option value="Girls Hostel Block B">Girls Hostel Block B</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="required">Date Lost / Found</label>
+              <input type="date" id="formDate" name="date_lost_found" required>
+            </div>
+            <div class="form-group">
+              <label>Approximate Time</label>
+              <input type="time" id="formTime" name="time_lost_found">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description & Context</label>
+            <textarea id="formDesc" name="description" rows="3" placeholder="Describe where you left/found it, surrounding objects, etc."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Unique Marks / Distinctive Features</label>
+            <input type="text" id="formMarks" name="unique_marks" placeholder="e.g., Small sticker near keyboard, red zipper keychain, scratch on base">
+          </div>
+
+          <!-- PRIVACY QUESTION SECTION (For Found items) -->
+          <div class="privacy-notice-box" id="privacyQuestionSection" style="display: none;">
+            <div class="privacy-box-header">
+              <i class="fa-solid fa-shield-halved text-warning"></i>
+              <h4>Privacy & Safety Feature</h4>
+            </div>
+            <p class="privacy-box-text">
+              Don't reveal private details publicly. Set a verification question that only the true owner can answer before unlocking your contact information!
+            </p>
+            <div class="form-group">
+              <label>Owner Verification Question</label>
+              <input type="text" id="formVerifyQuestion" name="verification_question" placeholder="e.g. What character is on the sticker near the keyboard?">
+            </div>
+            <div class="form-group">
+              <label>Expected Answer (Kept Secret)</label>
+              <input type="text" id="formVerifyAnswer" name="verification_answer" placeholder="e.g. Octocat / Red keychain">
+            </div>
+          </div>
+
+          <!-- CONTACT DETAILS -->
+          <div class="contact-section">
+            <h4 class="form-section-title"><i class="fa-solid fa-id-badge"></i> Your Contact Info</h4>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="required">Your Name</label>
+                <input type="text" id="formContactName" name="contact_name" required placeholder="Full Name">
+              </div>
+              <div class="form-group">
+                <label class="required">College Email</label>
+                <input type="email" id="formContactEmail" name="contact_email" required placeholder="student@campus.edu">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Phone Number (Optional)</label>
+              <input type="tel" id="formContactPhone" name="contact_phone" placeholder="+1 (555) 000-0000">
+            </div>
+          </div>
+
+          <!-- IMAGE UPLOAD -->
+          <div class="form-group">
+            <label>Upload Item Photo (Optional)</label>
+            <input type="file" id="formPhoto" name="photo" accept="image/*">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('reportModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="reportSubmitBtn">
+            <i class="fa-solid fa-paper-plane"></i> Submit & Scan For Matches
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. MATCH ANALYSIS & INSPECTOR MODAL -->
+  <div class="modal-overlay" id="matchModal" onclick="closeModalOnBackdrop(event, 'matchModal')">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-wand-magic-sparkles text-primary"></i>
+          <h2>Possible Match Analysis</h2>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('matchModal')">&times;</button>
+      </div>
+
+      <div class="modal-body" id="matchModalBody">
+        <!-- Loaded dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. PRIVACY CHALLENGE / CLAIM MODAL -->
+  <div class="modal-overlay" id="claimModal" onclick="closeModalOnBackdrop(event, 'claimModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-key text-warning"></i>
+          <h2>Verify Ownership & Claim</h2>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('claimModal')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="claim-info-banner">
+          <p>
+            To prevent fraud and protect privacy, please answer the finder's security question. Correct answers unlock the finder's contact details immediately.
+          </p>
+        </div>
+
+        <div class="claim-item-summary" id="claimItemSummary">
+          <!-- Item info -->
+        </div>
+
+        <form id="claimForm" onsubmit="handleClaimSubmit(event)">
+          <input type="hidden" id="claimFoundItemId">
+          <input type="hidden" id="claimLostItemId">
+          <input type="hidden" id="claimMatchScore" value="95">
+
+          <div class="verification-prompt-box">
+            <span class="prompt-badge"><i class="fa-solid fa-lock"></i> Finder's Security Question</span>
+            <div class="prompt-text" id="claimQuestionText">
+              "What character or logo is on the sticker near the keyboard?"
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="required">Your Answer</label>
+            <input type="text" id="claimAnswerInput" required placeholder="Type the secret identifying detail here...">
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="required">Your Name</label>
+              <input type="text" id="claimantName" required placeholder="Full Name">
+            </div>
+            <div class="form-group">
+              <label class="required">Your Campus Email</label>
+              <input type="email" id="claimantEmail" required placeholder="your.name@campus.edu">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Your Phone (Optional)</label>
+            <input type="tel" id="claimantPhone" placeholder="+1 (555) ...">
+          </div>
+
+          <div class="claim-result-box" id="claimResultBox" style="display: none;">
+            <!-- Rendered upon claim submission -->
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" onclick="closeModal('claimModal')">Cancel</button>
+            <button type="submit" class="btn btn-success" id="claimSubmitBtn">
+              <i class="fa-solid fa-unlock"></i> Verify & Unlock Contact
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. INSTANT MATCH ALERT MODAL (Appears right after submitting a new report) -->
+  <div class="modal-overlay" id="instantMatchModal" onclick="closeModalOnBackdrop(event, 'instantMatchModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i class="fa-solid fa-bell text-warning fa-shake"></i>
+          <h2>We Found an Instant Match!</h2>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('instantMatchModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="instantMatchModalBody">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main JS -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

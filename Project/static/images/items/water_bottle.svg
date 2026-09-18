@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="24" fill="#0f172a"/>
+  <!-- Cap & Handle -->
+  <rect x="86" y="28" width="28" height="16" rx="4" fill="#334155"/>
+  <path d="M100 28 C85 28 85 16 100 16 C115 16 115 28 100 28" stroke="#334155" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- Neck -->
+  <rect x="82" y="44" width="36" height="14" rx="2" fill="#1e293b"/>
+  <!-- Flask Body (Cobalt Blue) -->
+  <rect x="68" y="58" width="64" height="114" rx="18" fill="#1d4ed8" stroke="#3b82f6" stroke-width="2"/>
+  <!-- Highlight shine -->
+  <path d="M76 68 L76 158" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <!-- Bottom Dent detail -->
+  <path d="M116 166 Q122 168 126 164" stroke="#0f172a" stroke-width="3" fill="none"/>
+  <!-- Hydro Flask logo silhouette -->
+  <circle cx="100" cy="105" r="8" fill="#ffffff" opacity="0.9"/>
+  <path d="M96 117 Q100 120 104 117" stroke="#ffffff" stroke-width="2" fill="none"/>
+</svg>

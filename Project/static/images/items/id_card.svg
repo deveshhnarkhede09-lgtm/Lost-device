@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="24" fill="#0f172a"/>
+  <!-- Lanyard String -->
+  <path d="M100 10 L100 48" stroke="#3b82f6" stroke-width="8"/>
+  <rect x="92" y="48" width="16" height="10" rx="2" fill="#94a3b8"/>
+  <!-- Badge Card -->
+  <rect x="45" y="56" width="110" height="124" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <!-- Top Blue Band -->
+  <rect x="45" y="56" width="110" height="28" rx="8" fill="#1e3a8a"/>
+  <text x="100" y="70" font-family="sans-serif" font-weight="900" font-size="8.5" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">VIT BHOPAL</text>
+  <text x="100" y="80" font-family="sans-serif" font-weight="600" font-size="6" fill="#93c5fd" text-anchor="middle">STUDENT ID CARD</text>
+  <!-- Photo Avatar -->
+  <rect x="58" y="92" width="36" height="42" rx="4" fill="#e2e8f0"/>
+  <circle cx="76" cy="106" r="8" fill="#94a3b8"/>
+  <path d="M64 130 C64 120 88 120 88 130" fill="#94a3b8"/>
+  <!-- Details lines -->
+  <line x1="102" y1="96" x2="145" y2="96" stroke="#0f172a" stroke-width="3"/>
+  <line x1="102" y1="106" x2="135" y2="106" stroke="#64748b" stroke-width="2"/>
+  <line x1="102" y1="116" x2="140" y2="116" stroke="#64748b" stroke-width="2"/>
+  <line x1="102" y1="126" x2="130" y2="126" stroke="#2563eb" stroke-width="2"/>
+  <!-- Barcode -->
+  <g fill="#0f172a">
+    <rect x="58" y="148" width="3" height="18"/>
+    <rect x="64" y="148" width="6" height="18"/>
+    <rect x="73" y="148" width="2" height="18"/>
+    <rect x="78" y="148" width="5" height="18"/>
+    <rect x="86" y="148" width="4" height="18"/>
+    <rect x="93" y="148" width="2" height="18"/>
+    <rect x="98" y="148" width="7" height="18"/>
+    <rect x="108" y="148" width="3" height="18"/>
+    <rect x="114" y="148" width="5" height="18"/>
+    <rect x="122" y="148" width="2" height="18"/>
+    <rect x="127" y="148" width="6" height="18"/>
+    <rect x="136" y="148" width="4" height="18"/>
+  </g>
+</svg>

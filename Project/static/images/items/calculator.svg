@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="24" fill="#0f172a"/>
+  <!-- Calculator Body -->
+  <rect x="55" y="32" width="90" height="136" rx="14" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+  <!-- Solar & LCD Screen -->
+  <rect x="66" y="44" width="68" height="26" rx="4" fill="#94a3b8"/>
+  <rect x="68" y="46" width="64" height="22" rx="2" fill="#a3e635" opacity="0.85"/>
+  <text x="128" y="62" font-family="monospace" font-size="12" font-weight="bold" fill="#0f172a" text-anchor="end">991.00</text>
+  <!-- Keys Grid -->
+  <g fill="#334155" stroke="#475569">
+    <rect x="66" y="80" width="14" height="10" rx="2"/>
+    <rect x="84" y="80" width="14" height="10" rx="2"/>
+    <rect x="102" y="80" width="14" height="10" rx="2"/>
+    <rect x="120" y="80" width="14" height="10" rx="2"/>
+    
+    <rect x="66" y="96" width="14" height="10" rx="2"/>
+    <rect x="84" y="96" width="14" height="10" rx="2"/>
+    <rect x="102" y="96" width="14" height="10" rx="2"/>
+    <rect x="120" y="96" width="14" height="10" rx="2"/>
+
+    <rect x="66" y="112" width="14" height="10" rx="2" fill="#0284c7"/>
+    <rect x="84" y="112" width="14" height="10" rx="2" fill="#0284c7"/>
+    <rect x="102" y="112" width="14" height="10" rx="2" fill="#0284c7"/>
+    <rect x="120" y="112" width="14" height="10" rx="2" fill="#f43f5e"/>
+
+    <rect x="66" y="128" width="14" height="10" rx="2"/>
+    <rect x="84" y="128" width="14" height="10" rx="2"/>
+    <rect x="102" y="128" width="14" height="10" rx="2"/>
+    <rect x="120" y="128" width="14" height="10" rx="2"/>
+    
+    <rect x="66" y="144" width="32" height="10" rx="2"/>
+    <rect x="102" y="144" width="32" height="10" rx="2" fill="#10b981"/>
+  </g>
+  <!-- Hand marked RN -->
+  <text x="135" y="162" font-family="sans-serif" font-size="7" font-weight="bold" fill="#facc15">RN</text>
+</svg>

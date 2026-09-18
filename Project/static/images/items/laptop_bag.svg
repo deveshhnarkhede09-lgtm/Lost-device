@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="strapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="24" fill="#0f172a"/>
+  <!-- Handle -->
+  <path d="M75 55 C75 35 125 35 125 55" stroke="#475569" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Bag Body -->
+  <rect x="40" y="55" width="120" height="100" rx="14" fill="url(#bgGrad)" stroke="#38bdf8" stroke-width="2.5"/>
+  <!-- Front pocket -->
+  <rect x="52" y="95" width="96" height="50" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+  <!-- Zipper line -->
+  <line x1="52" y1="85" x2="148" y2="85" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 2"/>
+  <!-- Red keychain / tag -->
+  <circle cx="145" cy="85" r="4" fill="#ef4444"/>
+  <rect x="143" y="89" width="4" height="20" rx="2" fill="#ef4444"/>
+  <!-- HP logo badge -->
+  <circle cx="100" cy="120" r="14" fill="#0284c7"/>
+  <text x="100" y="125" font-family="sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle" font-style="italic">hp</text>
+</svg>
