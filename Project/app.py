@@ -67,6 +67,12 @@ def health_check():
     })
 
 @app.route("/")
+@app.route("/index")
+@app.route("/index.html")
+@app.route("/api")
+@app.route("/api/")
+@app.route("/api/index")
+@app.route("/api/index.py")
 def index():
     return render_template("index.html")
 
@@ -450,6 +456,25 @@ def test_match_sandbox():
         "success": True,
         "result": result
     })
+
+# ---------------------------------------------------------
+# SPA Catch-all & 404 Error Handling
+# ---------------------------------------------------------
+
+@app.route("/<path:path>")
+def catch_all(path):
+    if path.startswith("api/"):
+        return jsonify({"error": "API route not found", "path": path}), 404
+    if path.startswith("static/"):
+        rel_path = path.replace("static/", "", 1)
+        return app.send_static_file(rel_path)
+    return render_template("index.html")
+
+@app.errorhandler(404)
+def handle_404(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"error": "Endpoint not found", "path": request.path}), 404
+    return render_template("index.html")
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
